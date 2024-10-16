@@ -1,0 +1,25 @@
+{
+  "name": "pc-checker-be",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "dev": "tsx watch src/app.ts",
+    "start": "npm run build:ts && npm run dev && node src/app.ts --prod",
+    "build:ts": "tsc -p tsconfig.json"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@fastify/postgres": "^6.0.1",
+    "@fastify/websocket": "^11.0.1",
+    "@sinclair/typebox": "^0.33.16",
+    "@types/fastify-cors": "^2.1.0",
+    "@types/node": "^20.14.2",
+    "@types/pg": "^8.11.10",
+    "@types/ws": "^8.5.12",
+    "fastify": "^5.0.0",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.3"
+  }
+}
