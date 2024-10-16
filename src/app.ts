@@ -47,10 +47,8 @@ server.register(async function (fastify) {
   });
 });
 
-
 server.get("/api/v1/pc/status", {}, async (req, rep) => {
   try {
-
     emitter.emit("room-event", {
       client: "pc",
       event: "getStatus",
@@ -64,7 +62,6 @@ server.get("/api/v1/pc/status", {}, async (req, rep) => {
 
 server.get("/api/v1/process", {}, async (req, rep) => {
   try {
-
     emitter.emit("room-event", {
       client: "pc",
       event: "getProcess",
@@ -84,6 +81,19 @@ server.post("/api/v1/process", {}, async (req, rep) => {
       client: "pc",
       event: "terminateProcess",
       pid,
+    });
+
+    return rep.code(200).send("");
+  } catch (e) {
+    return rep.code(500).send(e);
+  }
+});
+
+server.post("/api/v1/pc/turn-off", {}, async (req, rep) => {
+  try {
+    emitter.emit("room-event", {
+      client: "pc",
+      event: "turnOff",
     });
 
     return rep.code(200).send("");

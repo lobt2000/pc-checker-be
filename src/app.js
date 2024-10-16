@@ -17,38 +17,30 @@ const fastify_1 = __importDefault(require("fastify"));
 const socket_emitter_1 = require("./emitter/socket-emitter");
 const server = (0, fastify_1.default)();
 server.register(websocket_1.default);
-// server.register(fastifyPostgres, {
-//   host: "localhost",
-//   user: "postgres",
-//   password: "qwerty1234",
-//   port: 5432,
-//   database: "postgres",
-// });
 server.register(function (fastify) {
     return __awaiter(this, void 0, void 0, function* () {
         fastify.get("/ws", { websocket: true }, (connection) => {
             connection.on("message", (data) => {
                 var _a;
                 const newData = JSON.parse(data.toString());
-                console.log(newData);
                 switch (newData.event) {
                     case "join":
                         const messageListener = (event) => {
-                            console.log(event);
-                            if (event.client == newData.clientId)
-                                connection.send(JSON.stringify(event));
+                            connection.send(JSON.stringify(event));
                         };
                         socket_emitter_1.emitter.on("room-event", messageListener);
                         break;
                     case "status":
                         socket_emitter_1.emitter.emit("room-event", {
                             client: newData.client,
+                            event: "status",
                             status: newData.status,
                         });
                         break;
                     case "process":
                         socket_emitter_1.emitter.emit("room-event", {
                             client: newData.client,
+                            event: "process",
                             process: (_a = newData.process) !== null && _a !== void 0 ? _a : [],
                         });
                         break;
@@ -57,41 +49,8 @@ server.register(function (fastify) {
         });
     });
 });
-// async function runMigrations(): Promise<void> {
-//   const client = new Client({
-//     host: "localhost",
-//     user: "postgres",
-//     password: "qwerty1234",
-//     port: 5432,
-//     database: "postgres",
-//   });
-//   try {
-//     await client.connect();
-//     const script = fs.readFileSync(
-//       path.join(__dirname, "./mock/create-tables.sql"),
-//       "utf8"
-//     );
-//     await client.query(script);
-//   } catch (error) {
-//     server.log.error("Error running migrations:", error);
-//   }
-// }
-// server.addHook("preHandler", (req, res, next) => {
-//   return next();
-// });
-// server.addHook("onReady", function (done) {
-//   runMigrations()
-//     .then(() => done())
-//     .catch((e) => {
-//       console.log(e);
-//     });
-// });
 server.get("/api/v1/pc/status", {}, (req, rep) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        // const status = (
-        //   await req.db.query("Select status from pc where id = $1", [1])
-        // ).rows[0];
-        console.log("fere");
         socket_emitter_1.emitter.emit("room-event", {
             client: "pc",
             event: "getStatus",
@@ -104,7 +63,6 @@ server.get("/api/v1/pc/status", {}, (req, rep) => __awaiter(void 0, void 0, void
 }));
 server.get("/api/v1/process", {}, (req, rep) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log("here");
         socket_emitter_1.emitter.emit("room-event", {
             client: "pc",
             event: "getProcess",
@@ -115,13 +73,25 @@ server.get("/api/v1/process", {}, (req, rep) => __awaiter(void 0, void 0, void 0
         return rep.code(500).send(e);
     }
 }));
-server.delete("/api/v1/process", {}, (req, rep) => __awaiter(void 0, void 0, void 0, function* () {
+server.post("/api/v1/process", {}, (req, rep) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { name } = req.body;
+        const { pid } = req.body;
         socket_emitter_1.emitter.emit("room-event", {
             client: "pc",
-            event: "killProcess",
-            name,
+            event: "terminateProcess",
+            pid,
+        });
+        return rep.code(200).send("");
+    }
+    catch (e) {
+        return rep.code(500).send(e);
+    }
+}));
+server.post("/api/v1/pc/turn-off", {}, (req, rep) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        socket_emitter_1.emitter.emit("room-event", {
+            client: "pc",
+            event: "turnOff",
         });
         return rep.code(200).send("");
     }
