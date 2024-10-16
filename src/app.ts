@@ -10,7 +10,8 @@ server.register(async function (fastify) {
   fastify.get("/ws", { websocket: true }, (connection) => {
     connection.on("message", (data) => {
       const newData = JSON.parse(data.toString());
-
+      console.log(newData);
+      
       switch (newData.event) {
         case "join":
           const messageListener = (event: {
