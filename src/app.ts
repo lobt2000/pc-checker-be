@@ -1,10 +1,17 @@
 import fastifyWebsocket from "@fastify/websocket";
 import fastify from "fastify";
 import { emitter } from "./emitter/socket-emitter";
+import fastifyCors from "@fastify/cors";
 
 const server = fastify();
 
 server.register(fastifyWebsocket);
+
+server.register(fastifyCors, {
+  origin: "*", // You can restrict this to a specific domain if needed
+  methods: ["GET", "PUT", "POST", "DELETE"],
+  allowedHeaders: ["Content-Type"], // Дозволені заголовки запитів
+});
 
 server.register(async function (fastify) {
   fastify.get("/ws", { websocket: true }, (connection) => {
