@@ -11,7 +11,7 @@ server.register(async function (fastify) {
     connection.on("message", (data) => {
       const newData = JSON.parse(data.toString());
       console.log(newData);
-      
+
       switch (newData.event) {
         case "join":
           const messageListener = (event: {
@@ -21,6 +21,8 @@ server.register(async function (fastify) {
             process?: any[];
             name?: string;
           }) => {
+            console.log(event, "send event");
+
             connection.send(JSON.stringify(event));
           };
 
@@ -34,6 +36,7 @@ server.register(async function (fastify) {
             event: "status",
             status: newData.status as boolean,
           });
+          console.log("send event from pc", newData.status as boolean);
           break;
 
         case "process":
@@ -42,6 +45,8 @@ server.register(async function (fastify) {
             event: "process",
             process: newData.process ?? [],
           });
+          console.log("send event from pc", newData.process ?? []);
+
           break;
       }
     });
@@ -55,6 +60,8 @@ server.get("/api/v1/pc/status", {}, async (req, rep) => {
       event: "getStatus",
     });
 
+    console.log("send event from client");
+
     return rep.code(200).send("");
   } catch (e) {
     return rep.code(500).send(e);
@@ -63,6 +70,8 @@ server.get("/api/v1/pc/status", {}, async (req, rep) => {
 
 server.get("/api/v1/process", {}, async (req, rep) => {
   try {
+    console.log("send event from client");
+
     emitter.emit("room-event", {
       client: "pc",
       event: "getProcess",
