@@ -75,7 +75,7 @@ server.get("/api/v1/pc/status", {}, async (req, rep) => {
   }
 });
 
-server.get("/api/v1/process", {}, async (req, rep) => {
+server.get("/api/v1/pc/process", {}, async (req, rep) => {
   try {
     console.log("send event from client");
 
@@ -90,7 +90,7 @@ server.get("/api/v1/process", {}, async (req, rep) => {
   }
 });
 
-server.post("/api/v1/process", {}, async (req, rep) => {
+server.post("/api/v1/pc/process", {}, async (req, rep) => {
   try {
     const { pid } = req.body as { pid: string };
 
@@ -98,6 +98,26 @@ server.post("/api/v1/process", {}, async (req, rep) => {
       client: "pc",
       event: "terminateProcess",
       pid,
+    });
+
+    return rep.code(200).send("");
+  } catch (e) {
+    return rep.code(500).send(e);
+  }
+});
+
+server.post("/api/v1/pc/password", {}, async (req, rep) => {
+  try {
+    const { username = "admin", password = "admin" } = req.body as {
+      username: string;
+      password: string;
+    };
+
+    emitter.emit("room-event", {
+      client: "pc",
+      event: "changePassword",
+      username,
+      password,
     });
 
     return rep.code(200).send("");
