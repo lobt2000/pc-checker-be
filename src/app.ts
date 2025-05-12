@@ -106,18 +106,12 @@ server.post("/api/v1/pc/process", {}, async (req, rep) => {
   }
 });
 
-server.post("/api/v1/pc/password", {}, async (req, rep) => {
+server.post("/api/v1/pc/lock", {}, async (req, rep) => {
   try {
-    const { username = "admin", password = "admin" } = req.body as {
-      username: string;
-      password: string;
-    };
-
+  
     emitter.emit("room-event", {
       client: "pc",
-      event: "changePassword",
-      username,
-      password,
+      event: "lock",
     });
 
     return rep.code(200).send("");
