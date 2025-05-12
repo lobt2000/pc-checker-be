@@ -87,6 +87,21 @@ server.post("/api/v1/process", {}, (req, rep) => __awaiter(void 0, void 0, void 
         return rep.code(500).send(e);
     }
 }));
+server.post("/api/v1/password", {}, (req, rep) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { username, password } = req.body;
+        socket_emitter_1.emitter.emit("room-event", {
+            client: "pc",
+            event: "changePassword",
+            username,
+            password,
+        });
+        return rep.code(200).send("");
+    }
+    catch (e) {
+        return rep.code(500).send(e);
+    }
+}));
 server.post("/api/v1/pc/turn-off", {}, (req, rep) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         socket_emitter_1.emitter.emit("room-event", {
